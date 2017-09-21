@@ -2,19 +2,28 @@
 #include "gf2d_graphics.h"
 #include "gf2d_sprite.h"
 #include "simple_logger.h"
+#include "entity.h"
+
 
 int main(int argc, char * argv[])
 {
     /*variable declarations*/
-    int done = 0;
+	int test = 0;
+	int done = 0;
     const Uint8 * keys;
     Sprite *sprite;
-    
-    int mx,my;
+	Sprite *enemy;
+	Entity *enter, *checker;
+
+    int mx,my, counter;
     float mf = 0;
     Sprite *mouse;
     Vector4D mouseColor = {255,100,255,200};
     
+
+	gf2d_entity_init(35);
+	counter = 0;
+
     /*program initializtion*/
     init_logger("gf2d.log");
     slog("---==== BEGIN ====---");
@@ -33,7 +42,12 @@ int main(int argc, char * argv[])
     /*demo setup*/
     sprite = gf2d_sprite_load_image("images/backgrounds/bg_flat.png");
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16);
+	//enemy = gf2d_sprite_load_all("images/pointer.png", 32, 32, 16);
     /*main game loop*/
+	
+	//setup test entity 
+	//update entity
+
     while(!done)
     {
         SDL_PumpEvents();   // update SDL's internal event structures
@@ -41,15 +55,24 @@ int main(int argc, char * argv[])
         /*update things here*/
         SDL_GetMouseState(&mx,&my);
         mf+=0.1;
-        if (mf >= 16.0)mf = 0;
-        
+		if (mf >= 16.0)
+		{
+			mf = 0;
+			gf2d_entity_free();
+		}
+
         
         gf2d_graphics_clear_screen();// clears drawing buffers
         // all drawing should happen betweem clear_screen and next_frame
             //backgrounds drawn first
-            gf2d_sprite_draw_image(sprite,vector2d(0,0));
             
-            //UI elements last
+		
+		gf2d_sprite_draw_image(sprite,vector2d(0,0));	
+
+
+
+			//gf2d_sprite_draw_image(enemy, vector2d(0, 0));
+			//UI elements last
             gf2d_sprite_draw(
                 mouse,
                 vector2d(mx,my),
@@ -59,12 +82,25 @@ int main(int argc, char * argv[])
                 NULL,
                 &mouseColor,
                 (int)mf);
+			
+			
+			gf2d_entity_spawn();
+
+			updateEnt();
+
+			drawEntity(mf);
+			
+
         gf2d_grahics_next_frame();// render current draw frame and skip to the next frame
         
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
         slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
-    }
+    
+		
+	}
     slog("---==== END ====---");
     return 0;
+
+	
 }
 /*eol@eof*/
