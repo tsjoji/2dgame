@@ -11,7 +11,7 @@ int main(int argc, char * argv[])
 	int test = 0;
 	int done = 0;
     const Uint8 * keys;
-    Sprite *sprite;
+    Sprite *sprite, *startscreen;
 	Sprite *enemy;
 	Entity *enter, *checker;
 
@@ -42,11 +42,33 @@ int main(int argc, char * argv[])
     /*demo setup*/
     sprite = gf2d_sprite_load_image("images/backgrounds/bg_flat.png");
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16);
+	startscreen = gf2d_sprite_load_image("images/backgrounds/foolsLogic.jpg");
 	//enemy = gf2d_sprite_load_all("images/pointer.png", 32, 32, 16);
     /*main game loop*/
 	
 	//setup test entity 
 	//update entity
+	int done1 = 0;
+	while (!done1)
+	{
+		SDL_PumpEvents();   // update SDL's internal event structures
+		keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
+		gf2d_graphics_clear_screen();// clears drawing buffers
+		
+		// all drawing should happen betweem clear_screen and next_frame
+		//backgrounds drawn first
+
+		gf2d_graphics_clear_screen();
+		gf2d_sprite_draw_image(startscreen, vector2d(0, 0));
+
+
+		gf2d_grahics_next_frame();// render current draw frame and skip to the next frame
+
+		if (keys[SDL_SCANCODE_RETURN])done1 = 1; // exit condition
+
+	}
+
+
 
     while(!done)
     {
