@@ -73,23 +73,17 @@ int main(int argc, char * argv[])
 
 			//gf2d_sprite_draw_image(enemy, vector2d(0, 0));
 			//UI elements last
-            gf2d_sprite_draw(
-                mouse,
-                vector2d(mx,my),
-                NULL,
-                NULL,
-                NULL,
-                NULL,
-                &mouseColor,
-                (int)mf);
+            
 			
 			
 			gf2d_entity_spawn();
 
 			updateEnt();
 
-			drawEntity(mf);
+			drawEntity((int)mf);
 			
+			Ent_Hit();
+
 
         gf2d_grahics_next_frame();// render current draw frame and skip to the next frame
         

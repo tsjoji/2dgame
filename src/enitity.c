@@ -1,8 +1,10 @@
 #include "entity.h"
 #include <math.h>
 #include "gf2d_types.h"
+#include <SDL.h>
 
-#define entitySize 5
+
+#define entitySize 15
 
 
 typedef struct 
@@ -23,6 +25,7 @@ gf2d_entity_init()
 		entity_manager.EntityList[counter] = (Entity *)malloc(sizeof(Entity));
 		memset(entity_manager.EntityList[counter], 0, sizeof(Entity));
 	}
+	entity_manager.EntityList[0]->player = 1;
 
 }
 
@@ -58,7 +61,7 @@ drawEntity(int mf)
 				NULL,
 				NULL,
 				NULL,
-				1);
+				mf);
 			entity_manager.EntityList[counter]->pos.x += 5;
 		}
 	}
@@ -66,31 +69,74 @@ drawEntity(int mf)
 
 updateEnt()
 {
+	int mx, my;
 	Vector4D mouseColor = { 255, 100, 255, 200 };
-	int counter = 0;
-	for (counter = 0; counter < entitySize;counter++)
+	int counter = 1;
+	SDL_GetMouseState(&mx, &my);
+	for (counter = 1; counter < entitySize;counter++)
 	{
 
 		gf2d_rotTransx2(entity_manager.EntityList[counter]);
 		
 		//gf2d_sprite_draw_image(entity_manager.EntityList[counter]->img, vector2d(250, 300));
 	}
+	
+	entity_manager.EntityList[0]->pos.x = mx;
+	entity_manager.EntityList[0]->pos.y = my;
+
+}
+
+Ent_Hit()
+{
+	int counter;
+	for (counter = 1; counter < entitySize; counter++)
+	{
+
+		if (entity_manager.EntityList[0]->pos.x >= (entity_manager.EntityList[counter]->pos.x-16)&&
+			entity_manager.EntityList[0]->pos.x <= (entity_manager.EntityList[counter]->pos.x + 16) &&
+			entity_manager.EntityList[0]->pos.y >= (entity_manager.EntityList[counter]->pos.y - 16) && 
+			entity_manager.EntityList[0]->pos.y <= (entity_manager.EntityList[counter]->pos.y + 16)
+			)
+		{
+			gf2d_entity_free_one(counter);
+		}
+
+
+		//gf2d_sprite_draw_image(entity_manager.EntityList[counter]->img, vector2d(250, 300));
+	}
 }
 
 
 /*
-*@ frees memory in the structure
+*@ frees all memory in the structure minus player
 *@
 */
 
 void gf2d_entity_free()
 {
-	int counter = 0;
+	int counter = 1;
 	for (counter; counter < entitySize;counter++)
 	{
-		entity_manager.EntityList[counter]->inuse = 0;
+		
+		memset(entity_manager.EntityList[counter], 0, sizeof(Entity));
 	}
+
 }
+
+/*
+*@ frees specific memory in the structure
+*@
+*/
+void gf2d_entity_free_one(int remove)
+{
+	
+		memset(entity_manager.EntityList[remove], 0, sizeof(Entity));
+	
+
+}
+
+
+
 
 
 static int delta = 0;

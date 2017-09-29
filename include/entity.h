@@ -15,6 +15,7 @@ typedef struct Entity_S
 	int invcib;/**<invcibility to the player*/
 	int damaging;/**<enemy bullet able to dmg*/
 	int inuse;
+	int player;
 }Entity;
 
 /*
@@ -45,3 +46,7 @@ void gf2d_rotTransx2(Entity *ent);
 */
 void gf2d_crazyzone(Entity *ent);
 
+/*
+*@frees one element
+*/
+void gf2d_entity_free_one(int remove);
