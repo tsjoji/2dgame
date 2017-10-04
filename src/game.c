@@ -13,7 +13,7 @@ int main(int argc, char * argv[])
 	int reallydone = 0;
 	int levelSelect = 0;
     const Uint8 * keys;
-    Sprite *sprite, *startscreen, *endscreen;
+	Sprite *sprite, *sprite1, *deleteme,*startscreen, *endscreen;
 	Sprite *enemy;
 	Entity *enter, *checker;
 
@@ -45,10 +45,13 @@ int main(int argc, char * argv[])
     
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16);
 	startscreen = gf2d_sprite_load_image("images/backgrounds/foolsLogic.jpg");
+
 	endscreen = gf2d_sprite_load_image("images/backgrounds/end screen.png");
 	//enemy = gf2d_sprite_load_all("images/pointer.png", 32, 32, 16);
     /*main game loop*/
 	
+	deleteme = gf2d_sprite_load_image("images/ui/health bar.png");
+
 	//setup test entity 
 	//update entity
 	int done1 = 0;
@@ -68,6 +71,8 @@ int main(int argc, char * argv[])
 			gf2d_sprite_draw_image(startscreen, vector2d(0, 0));
 
 
+
+
 			gf2d_grahics_next_frame();// render current draw frame and skip to the next frame
 
 			if (keys[SDL_SCANCODE_RETURN])done1 = 1; // exit condition
@@ -82,14 +87,21 @@ int main(int argc, char * argv[])
 			break;
 		}
 
+		//change this up put in a c file just dont know what to do with it
 		levelSelect = rand() % 3;
 		if (levelSelect == 0)
+		{
 			sprite = gf2d_sprite_load_image("images/backgrounds/lavaWorld.jpg");
+			sprite1 = gf2d_sprite_load_image("images/backgrounds/lavaWorld.jpg");
+		}
 		if (levelSelect == 1)
 			sprite = gf2d_sprite_load_image("images/backgrounds/postApocDontMove.jpg");
 		if (levelSelect == 2)
+		{
 			sprite = gf2d_sprite_load_image("images/backgrounds/skyLevel.png");
-		
+			sprite1 = gf2d_sprite_load_image("images/backgrounds/skyLevel.png");
+		}	
+	
 		while (!done)
 		{
 			SDL_PumpEvents();   // update SDL's internal event structures
@@ -114,7 +126,7 @@ int main(int argc, char * argv[])
 			
 			gf2d_sprite_draw_image(sprite, vector2d(0, 0));
 
-
+			gf2d_sprite_draw_image(deleteme, vector2d(50, 25));
 
 			//gf2d_sprite_draw_image(enemy, vector2d(0, 0));
 			//UI elements last
