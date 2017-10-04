@@ -10,8 +10,10 @@ int main(int argc, char * argv[])
     /*variable declarations*/
 	int test = 0;
 	int done = 0;
+	int reallydone = 0;
+	int levelSelect = 0;
     const Uint8 * keys;
-    Sprite *sprite, *startscreen;
+    Sprite *sprite, *startscreen, *endscreen;
 	Sprite *enemy;
 	Entity *enter, *checker;
 
@@ -40,79 +42,146 @@ int main(int argc, char * argv[])
     SDL_ShowCursor(SDL_DISABLE);
     
     /*demo setup*/
-    sprite = gf2d_sprite_load_image("images/backgrounds/bg_flat.png");
+    
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16);
 	startscreen = gf2d_sprite_load_image("images/backgrounds/foolsLogic.jpg");
+	endscreen = gf2d_sprite_load_image("images/backgrounds/end screen.png");
 	//enemy = gf2d_sprite_load_all("images/pointer.png", 32, 32, 16);
     /*main game loop*/
 	
 	//setup test entity 
 	//update entity
 	int done1 = 0;
-	while (!done1)
+	while (1)
 	{
-		SDL_PumpEvents();   // update SDL's internal event structures
-		keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
-		gf2d_graphics_clear_screen();// clears drawing buffers
-		
-		// all drawing should happen betweem clear_screen and next_frame
-		//backgrounds drawn first
 
-		gf2d_graphics_clear_screen();
-		gf2d_sprite_draw_image(startscreen, vector2d(0, 0));
-
-
-		gf2d_grahics_next_frame();// render current draw frame and skip to the next frame
-
-		if (keys[SDL_SCANCODE_RETURN])done1 = 1; // exit condition
-
-	}
-
-
-
-    while(!done)
-    {
-        SDL_PumpEvents();   // update SDL's internal event structures
-        keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
-        /*update things here*/
-        SDL_GetMouseState(&mx,&my);
-        mf+=0.1;
-		if (mf >= 16.0)
+		while (!done1)
 		{
-			mf = 0;
-			gf2d_entity_free();
+			SDL_PumpEvents();   // update SDL's internal event structures
+			keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
+			gf2d_graphics_clear_screen();// clears drawing buffers
+
+			// all drawing should happen betweem clear_screen and next_frame
+			//backgrounds drawn first
+
+			gf2d_graphics_clear_screen();
+			gf2d_sprite_draw_image(startscreen, vector2d(0, 0));
+
+
+			gf2d_grahics_next_frame();// render current draw frame and skip to the next frame
+
+			if (keys[SDL_SCANCODE_RETURN])done1 = 1; // exit condition
+			if (keys[SDL_SCANCODE_ESCAPE])
+			{
+				reallydone = 1;
+				break;
+			}
+		}
+		if (reallydone)
+		{
+			break;
 		}
 
-        
-        gf2d_graphics_clear_screen();// clears drawing buffers
-        // all drawing should happen betweem clear_screen and next_frame
-            //backgrounds drawn first
-            
+		levelSelect = rand() % 3;
+		if (levelSelect == 0)
+			sprite = gf2d_sprite_load_image("images/backgrounds/lavaWorld.jpg");
+		if (levelSelect == 1)
+			sprite = gf2d_sprite_load_image("images/backgrounds/postApocDontMove.jpg");
+		if (levelSelect == 2)
+			sprite = gf2d_sprite_load_image("images/backgrounds/skyLevel.png");
 		
-		gf2d_sprite_draw_image(sprite,vector2d(0,0));	
+		while (!done)
+		{
+			SDL_PumpEvents();   // update SDL's internal event structures
+			keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
+			/*update things here*/
+			SDL_GetMouseState(&mx, &my);
+			mf += 0.1;
+			if (mf >= 16.0)
+			{
+				mf = 0;
+				gf2d_entity_free();
+			}
+
+
+			gf2d_graphics_clear_screen();// clears drawing buffers
+			// all drawing should happen betweem clear_screen and next_frame
+			//backgrounds drawn first
+
+
+
+			
+			
+			gf2d_sprite_draw_image(sprite, vector2d(0, 0));
 
 
 
 			//gf2d_sprite_draw_image(enemy, vector2d(0, 0));
 			//UI elements last
-            
-			
-			
+
+
+
 			gf2d_entity_spawn();
 
 			updateEnt();
 
 			drawEntity((int)mf);
-			
+
 			Ent_Hit();
 
 
-        gf2d_grahics_next_frame();// render current draw frame and skip to the next frame
-        
-        if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
-        slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
-    
+			gf2d_grahics_next_frame();// render current draw frame and skip to the next frame
+
+			if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
+			
+			
+			slog("Rendering at %f FPS", gf2d_graphics_get_frames_per_second());
+			if (keys[SDL_SCANCODE_ESCAPE])
+			{
+				reallydone = 1;
+				break;
+			}
+
+		}
+		done = 0;
+		done1 = 0;
+
+		if (reallydone)
+		{
+			break;
+		}
+
+		while (!done)
+		{
+			SDL_PumpEvents();   // update SDL's internal event structures
+			keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
+			gf2d_graphics_clear_screen();// clears drawing buffers
+
+			// all drawing should happen betweem clear_screen and next_frame
+			//backgrounds drawn first
+
+			gf2d_graphics_clear_screen();
+			gf2d_sprite_draw_image(endscreen, vector2d(0, 0));
+
+
+			gf2d_grahics_next_frame();// render current draw frame and skip to the next frame
+
+			if (keys[SDL_SCANCODE_BACKSPACE])done = 1; // exit condition
+			
+			
+			if (keys[SDL_SCANCODE_ESCAPE])
+			{
+				reallydone = 1;
+				break;
+			}
 		
+		}
+		done = 0;
+
+		if (reallydone)
+		{
+			break;
+		}
 	}
     slog("---==== END ====---");
     return 0;
