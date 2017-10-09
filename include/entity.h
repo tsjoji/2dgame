@@ -8,7 +8,7 @@ typedef struct Entity_S
 	int health;/** how much health player has*/
 	int scale;/** how uch to scale null will indicate no change*/
 	int theta;/** */
-    Vector2D pos;/** current location .x for x pos .y for y pos*/
+	Vector2D pos;/** current location .x for x pos .y for y pos*/
 	int velocity;/**how fast it can go */
 	double time;/**checks how long certain enitities have to live boss abilities have this */
 	int invcib;/**<invcibility to the player*/
@@ -25,8 +25,8 @@ typedef struct Entity_S
 void gf2d_entity_init();
 
 /*
-*@ spawns the enemies 
-*@ right now since there are no spawning conditons will just spawn as many as possible if they are not in use 
+*@ spawns the enemies
+*@ right now since there are no spawning conditons will just spawn as many as possible if they are not in use
 */
 void gf2d_entity_spawn();
 
@@ -34,21 +34,21 @@ void gf2d_entity_spawn();
 *@ checks if the entity is in use if true will draw them
 *@
 */
-drawEntity(int mf);
+void drawEntity(int mf);
 
 
 /*
 *@ changes x and y positions of each entity using the correct function if ai based
 *@if player will just get mouse location
 */
-updateEnt();
+void updateEnt();
 
 
 /*
-*@ checks to see if any entity is hitting the player 
+*@ checks to see if any entity is hitting the player
 *@
 */
-Ent_Hit();
+void Ent_Hit();
 
 /*
 *@ frees all memory in the structure except the player

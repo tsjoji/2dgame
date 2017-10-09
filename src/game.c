@@ -52,6 +52,7 @@ int main(int argc, char * argv[])
 	
 	deleteme = gf2d_sprite_load_image("images/ui/health bar.png");
 
+	
 	//setup test entity 
 	//update entity
 	int done1 = 0;
@@ -88,20 +89,16 @@ int main(int argc, char * argv[])
 		}
 
 		//change this up put in a c file just dont know what to do with it
-		levelSelect = rand() % 3;
-		if (levelSelect == 0)
-		{
-			sprite = gf2d_sprite_load_image("images/backgrounds/lavaWorld.jpg");
-			sprite1 = gf2d_sprite_load_image("images/backgrounds/lavaWorld.jpg");
-		}
-		if (levelSelect == 1)
-			sprite = gf2d_sprite_load_image("images/backgrounds/postApocDontMove.jpg");
-		if (levelSelect == 2)
-		{
-			sprite = gf2d_sprite_load_image("images/backgrounds/skyLevel.png");
-			sprite1 = gf2d_sprite_load_image("images/backgrounds/skyLevel.png");
-		}	
-	
+			
+	    
+		//Soundinit();
+
+		//load the level
+		init_UI();
+		selectlevel();//select the level
+		Soundinit2();//init the sound
+		//end loading
+		
 		while (!done)
 		{
 			SDL_PumpEvents();   // update SDL's internal event structures
@@ -124,15 +121,19 @@ int main(int argc, char * argv[])
 
 			
 			
-			gf2d_sprite_draw_image(sprite, vector2d(0, 0));
+			//gf2d_sprite_draw_image(sprite, vector2d(0, 0));
+			loadlevel();
 
-			gf2d_sprite_draw_image(deleteme, vector2d(50, 25));
+
+			//gf2d_sprite_draw_image(deleteme, vector2d(50, 25));
 
 			//gf2d_sprite_draw_image(enemy, vector2d(0, 0));
-			//UI elements last
+			
 
+			
+			
 
-
+             
 			gf2d_entity_spawn();
 
 			updateEnt();
@@ -141,11 +142,12 @@ int main(int argc, char * argv[])
 
 			Ent_Hit();
 
+			//UI elements last
+			draw_UI(0.3);
 
 			gf2d_grahics_next_frame();// render current draw frame and skip to the next frame
 
-			if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
-			
+			if (keys[SDL_SCANCODE_BACKSPACE])done = 1; // exit condition			
 			
 			slog("Rendering at %f FPS", gf2d_graphics_get_frames_per_second());
 			if (keys[SDL_SCANCODE_ESCAPE])

@@ -57,7 +57,7 @@ void gf2d_entity_spawn()
 }
 
 
-drawEntity(int mf)
+void drawEntity(int mf)
 {
 	Vector4D mouseColor = { 255, 100, 255, 200 };
 	int counter = 0;
@@ -92,7 +92,7 @@ drawEntity(int mf)
 	}
 }
 
-updateEnt()
+void updateEnt()
 {
 	int mx, my;
 	Vector4D mouseColor = { 255, 100, 255, 200 };
@@ -111,7 +111,7 @@ updateEnt()
 
 }
 
-Ent_Hit()
+void Ent_Hit()
 {
 	int counter;
 	for (counter = 1; counter < entitySize; counter++)
