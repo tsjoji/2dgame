@@ -3,7 +3,7 @@
 #include "gf2d_sprite.h"
 #include "simple_logger.h"
 #include "entity.h"
-
+#include <stdio.h>
 
 int main(int argc, char * argv[])
 {
@@ -17,13 +17,14 @@ int main(int argc, char * argv[])
 	Sprite *enemy;
 	Entity *enter, *checker;
 
-    int mx,my, counter;
+    int mx,my, counter, boss;
     float mf = 0;
     Sprite *mouse;
     Vector4D mouseColor = {255,100,255,200};
     
-
-	gf2d_entity_init(35);
+	FILE *file;
+	int lengthofsong;
+	double starttime, currtime;
 	counter = 0;
 
     /*program initializtion*/
@@ -95,10 +96,22 @@ int main(int argc, char * argv[])
 
 		//load the level
 		init_UI();
-		selectlevel();//select the level
-		Soundinit2();//init the sound
+		boss= selectlevel();//select the level
+		gf2d_entity_init(boss);
+		Soundinit();//init the sound
 		//end loading
 		
+		file = fopen("test2.wav", "rb");
+		fseek(file, 0, SEEK_END);
+		lengthofsong = ftell(file);
+		fclose(file);
+		lengthofsong = lengthofsong * 8 / (44100 * 2 * 16);//sizeoffile * bit to byte conversion/(samplerate * channels*bitdepth)
+
+
+		SoundVolume();
+
+		
+		starttime = SDL_GetTicks();
 		while (!done)
 		{
 			SDL_PumpEvents();   // update SDL's internal event structures
@@ -106,10 +119,10 @@ int main(int argc, char * argv[])
 			/*update things here*/
 			SDL_GetMouseState(&mx, &my);
 			mf += 0.1;
-			if (mf >= 16.0)
+			if (mf >= 21.0)
 			{
 				mf = 0;
-				gf2d_entity_free();
+				
 			}
 
 
@@ -117,7 +130,7 @@ int main(int argc, char * argv[])
 			// all drawing should happen betweem clear_screen and next_frame
 			//backgrounds drawn first
 
-
+			
 
 			
 			
@@ -138,12 +151,16 @@ int main(int argc, char * argv[])
 
 			updateEnt();
 
-			drawEntity((int)mf);
+			drawEntity((int)mf, boss);
 
 			Ent_Hit();
 
 			//UI elements last
 			draw_UI(0.3);
+
+
+			currtime = SDL_GetTicks();
+			draw_text((int)(lengthofsong-(currtime-starttime)/1000));
 
 			gf2d_grahics_next_frame();// render current draw frame and skip to the next frame
 
@@ -165,6 +182,11 @@ int main(int argc, char * argv[])
 			break;
 		}
 
+		
+
+		Soundclose();
+
+
 		while (!done)
 		{
 			SDL_PumpEvents();   // update SDL's internal event structures
@@ -180,7 +202,7 @@ int main(int argc, char * argv[])
 
 			gf2d_grahics_next_frame();// render current draw frame and skip to the next frame
 
-			if (keys[SDL_SCANCODE_BACKSPACE])done = 1; // exit condition
+			if (keys[SDL_SCANCODE_TAB])done = 1; // exit condition
 			
 			
 			if (keys[SDL_SCANCODE_ESCAPE])

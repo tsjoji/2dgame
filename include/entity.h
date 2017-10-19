@@ -4,6 +4,7 @@
 //entity based game
 typedef struct Entity_S
 {
+	
 	Sprite *img;/** pointer to the entity img*/
 	int health;/** how much health player has*/
 	int scale;/** how uch to scale null will indicate no change*/
@@ -14,7 +15,11 @@ typedef struct Entity_S
 	int invcib;/**<invcibility to the player*/
 	int damaging;/**<enemy bullet able to dmg*/
 	int inuse;/**checks to see if memory is in use */
-	int type;/**<0 is player, 1 is boss else bullet*/
+	int type;/**<1 is player, 2 is boss, else bullet*/
+	float frame;/**<what frame the sprite is on*/
+	float delta;/**<how fast to change each frames*/
+	int maxFrames;/**<max frames*/
+	int identity;/**<unique pattern for rot2x 0-12*/
 }Entity;
 
 
@@ -22,7 +27,7 @@ typedef struct Entity_S
 *@ mallocs and memsets array of x entities to 0
 *@
 */
-void gf2d_entity_init();
+void gf2d_entity_init(int boss);
 
 /*
 *@ spawns the enemies
