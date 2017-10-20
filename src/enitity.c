@@ -4,7 +4,7 @@
 #include <SDL.h>
 
 
-#define entitySize 1500
+#define entitySize 15000
 
 
 typedef struct

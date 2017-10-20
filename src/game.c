@@ -102,11 +102,12 @@ int main(int argc, char * argv[])
 		//end loading
 		
 		file = fopen("test2.wav", "rb");
+		Soundinfo(file);
 		fseek(file, 0, SEEK_END);
-		lengthofsong = ftell(file);
+		//lengthofsong = ftell(file);
 		fclose(file);
-		lengthofsong = lengthofsong * 8 / (44100 * 2 * 16);//sizeoffile * bit to byte conversion/(samplerate * channels*bitdepth)
-
+		//lengthofsong = lengthofsong * 8 / (44100 * 2 * 16);//sizeoffile * bit to byte conversion/(samplerate * channels*bitdepth)
+		lengthofsong = 0;
 
 		SoundVolume();
 
