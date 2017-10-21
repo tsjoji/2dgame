@@ -10,12 +10,13 @@ typedef struct Entity_S
 	int scale;/** how uch to scale null will indicate no change*/
 	int theta;/** */
 	Vector2D pos;/** current location .x for x pos .y for y pos*/
+	Vector2D rise_run;/** how quickly the rise/run will be .x will be run and .y will be rise*/
 	int velocity;/**how fast it can go */
 	double time;/**checks how long certain enitities have to live boss abilities have this */
 	int invcib;/**<invcibility to the player*/
 	int damaging;/**<enemy bullet able to dmg*/
 	int inuse;/**checks to see if memory is in use */
-	int type;/**<1 is player, 2 is boss, else bullet*/
+	int type;/**<1 is player, 2 is boss, , 3 is beam1, 4 is beam2, else bullet*/
 	float frame;/**<what frame the sprite is on*/
 	float delta;/**<how fast to change each frames*/
 	int maxFrames;/**<max frames*/

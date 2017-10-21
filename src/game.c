@@ -12,7 +12,11 @@ int main(int argc, char * argv[])
 	int done = 0;
 	int reallydone = 0;
 	int levelSelect = 0;
-    const Uint8 * keys;
+	int spawncontroller = 10;
+	int aichange, timer;
+	int aitype=1;
+	
+	const Uint8 * keys;
 	Sprite *sprite, *sprite1, *deleteme,*startscreen, *endscreen;
 	Sprite *enemy;
 	Entity *enter, *checker;
@@ -26,6 +30,7 @@ int main(int argc, char * argv[])
 	int lengthofsong;
 	double starttime, currtime;
 	counter = 0;
+	
 
     /*program initializtion*/
     init_logger("gf2d.log");
@@ -96,23 +101,28 @@ int main(int argc, char * argv[])
 
 		//load the level
 		init_UI();
-		boss= selectlevel();//select the level
-		gf2d_entity_init(boss);
+		
+		
 		Soundinit();//init the sound
 		//end loading
 		
-		file = fopen("test2.wav", "rb");
+		boss = selectlevel();//select the level
+
+
+
+		gf2d_entity_init(boss, 230000);
+
+		
+		file = fopen("test2.wav","rb");
 		Soundinfo(file);
-		fseek(file, 0, SEEK_END);
-		//lengthofsong = ftell(file);
-		fclose(file);
-		//lengthofsong = lengthofsong * 8 / (44100 * 2 * 16);//sizeoffile * bit to byte conversion/(samplerate * channels*bitdepth)
-		lengthofsong = 0;
+
+		lengthofsong = timeofsong();
 
 		SoundVolume();
 
 		
 		starttime = SDL_GetTicks();
+		aichange= lengthofsong/numchuncks();
 		while (!done)
 		{
 			SDL_PumpEvents();   // update SDL's internal event structures
@@ -123,7 +133,7 @@ int main(int argc, char * argv[])
 			if (mf >= 21.0)
 			{
 				mf = 0;
-				
+
 			}
 
 
@@ -131,10 +141,10 @@ int main(int argc, char * argv[])
 			// all drawing should happen betweem clear_screen and next_frame
 			//backgrounds drawn first
 
-			
 
-			
-			
+
+
+
 			//gf2d_sprite_draw_image(sprite, vector2d(0, 0));
 			loadlevel();
 
@@ -142,15 +152,20 @@ int main(int argc, char * argv[])
 			//gf2d_sprite_draw_image(deleteme, vector2d(50, 25));
 
 			//gf2d_sprite_draw_image(enemy, vector2d(0, 0));
-			
 
+
+
+
+			if (spawncontroller==10)
+			{
+				spawncontroller = 0;
+			    gf2d_entity_spawn(aitype);
+	     	}
+			spawncontroller++;
+			
+				updateEnt();
 			
 			
-
-             
-			gf2d_entity_spawn();
-
-			updateEnt();
 
 			drawEntity((int)mf, boss);
 
@@ -162,6 +177,21 @@ int main(int argc, char * argv[])
 
 			currtime = SDL_GetTicks();
 			draw_text((int)(lengthofsong-(currtime-starttime)/1000));
+
+			timer = (int)((currtime - starttime) / 1000);
+			slog("%i", timer);
+			if (timer > aichange)
+			{
+				aichange = aichange + (lengthofsong / numchuncks());
+				aitype++;
+				if (aitype == 3 && boss != 1)
+				{
+					aitype++;
+				}
+				if (aitype > 4)
+					aitype = 2;
+
+			}
 
 			gf2d_grahics_next_frame();// render current draw frame and skip to the next frame
 
@@ -184,9 +214,11 @@ int main(int argc, char * argv[])
 		}
 
 		
-
+		aichange = 0;
+		timer = 0;
+		aitype = 1;
 		Soundclose();
-
+		gf2d_entity_free();
 
 		while (!done)
 		{
