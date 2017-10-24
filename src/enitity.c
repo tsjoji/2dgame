@@ -5,7 +5,7 @@
 #include "simple_logger.h"
 
 
-#define entitySize 150
+#define entitySize 1500
 
 #define deltamove 1
 #define deltamax 360
@@ -91,23 +91,46 @@ void gf2d_entity_spawn(int AI_Pattern)//AI function 1
 			{
 				if (entity_manager.EntityList[counter]->inuse == 0)
 				{
-					
+					deltax++;
 					entity_manager.EntityList[counter]->inuse = 1;
 					entity_manager.EntityList[counter]->maxFrames = 3;
 					entity_manager.EntityList[counter]->frame = 0;
-					entity_manager.EntityList[counter]->pos.x = 0+horizontaldelta;
-					entity_manager.EntityList[counter]->pos.y = 5;
-					entity_manager.EntityList[counter]->scale = 1;
-					entity_manager.EntityList[counter]->rise_run.x = 0;
-					entity_manager.EntityList[counter]->rise_run.y = AI2_speed;
-					horizontaldelta += 25;
-					if (horizontaldelta > 1200)
-					{
-						
-						horizontaldelta = 0;
-					}
+					entity_manager.EntityList[counter]->delta = 0.07;
+					entity_manager.EntityList[counter]->pos.x = 1050;
+					entity_manager.EntityList[counter]->pos.y = 650;
+					entity_manager.EntityList[counter]->rise_run.x = deltax;
+					entity_manager.EntityList[counter]->rise_run.y = 1;
+					entity_manager.EntityList[counter]->scale = 1.0;
 					break;
+
 				}
+
+				for (counter; counter < entitySize; counter++)
+				{
+					if (entity_manager.EntityList[counter]->inuse == 0)
+					{
+						deltax++;
+						entity_manager.EntityList[counter]->inuse = 1;
+						entity_manager.EntityList[counter]->maxFrames = 3;
+						entity_manager.EntityList[counter]->frame = 0;
+						entity_manager.EntityList[counter]->delta = 0.07;
+						entity_manager.EntityList[counter]->pos.x = 20;
+						entity_manager.EntityList[counter]->pos.y = 650;
+						entity_manager.EntityList[counter]->scale = 1;
+						entity_manager.EntityList[counter]->rise_run.x = -deltax;
+						entity_manager.EntityList[counter]->rise_run.y = -1.0;
+						break;
+
+					}
+				}
+
+				if (180 < deltax)
+					deltax = 1;
+
+
+
+
+				entity_manager.EntityList[0]->maxFrames = 1;
 			}
 
 			
@@ -252,7 +275,7 @@ void gf2d_entity_spawn(int AI_Pattern)//AI function 1
 				entity_manager.EntityList[counter]->maxFrames = 3;
 				entity_manager.EntityList[counter]->frame = 0;
 				entity_manager.EntityList[counter]->delta = 0.07;
-				entity_manager.EntityList[counter]->pos.x = spawner_x + AI2_leftx;
+				entity_manager.EntityList[counter]->pos.x = 500;
 				entity_manager.EntityList[counter]->pos.y = spawner_y + AI2_y;
 				entity_manager.EntityList[counter]->rise_run.x = deltax;
 				entity_manager.EntityList[counter]->rise_run.y = 1;
@@ -270,7 +293,7 @@ void gf2d_entity_spawn(int AI_Pattern)//AI function 1
 					entity_manager.EntityList[counter]->maxFrames = 3;
 					entity_manager.EntityList[counter]->frame = 0;
 					entity_manager.EntityList[counter]->delta = 0.07;
-					entity_manager.EntityList[counter]->pos.x = spawner_x + AI2_rightx;
+					entity_manager.EntityList[counter]->pos.x = 600;
 					entity_manager.EntityList[counter]->pos.y = spawner_y + AI2_y;
 					entity_manager.EntityList[counter]->scale = 1;
 					entity_manager.EntityList[counter]->rise_run.x = -deltax;
@@ -293,7 +316,7 @@ void gf2d_entity_spawn(int AI_Pattern)//AI function 1
 }
 
 
-void drawEntity(int mf, int boss)
+void drawEntity(int mf, int boss, int endgame)
 {
 	Vector4D mouseColor = { 255, 100, 255, 200 };
 	int counter = 0;
@@ -302,7 +325,8 @@ void drawEntity(int mf, int boss)
 	for (counter; counter<entitySize; counter++)
 	{
 		
-
+		if (endgame == 1 && counter>1)
+			return;
 		if (entity_manager.EntityList[counter]->inuse == 1)
 		{
 
@@ -379,7 +403,7 @@ void updateEnt()
 			}
 			if (AI_Type == 4)
 			{
-				AI_Function2_Move(entity_manager.EntityList[counter], counter);
+				AI_Function4_Move(entity_manager.EntityList[counter], counter);
 				entity_manager.EntityList[counter]->pos.y += 3.3;
 			}
 		}
@@ -517,15 +541,17 @@ AI_Function2_Move(Entity *ent, int location)
 
 }
 
-AI_Function1_Move(Entity *ent, int location)
+
+AI_Function4_Move(Entity *ent, int location)
 {
-	if (ent->pos.x < 0 || ent->pos.x>1300)
+
+	if (ent->pos.x < 0 || ent->pos.x>1150)
 	{
 		gf2d_entity_free_one(location);
 	}
 	else
 	{
-		ent->pos.x = ent->pos.x + ent->rise_run.x;
+		ent->pos.x = cos(ent->rise_run.x) * 3 + ent->pos.x;
 
 	}
 	if (ent->pos.y < 0 || ent->pos.y>719)
@@ -534,7 +560,32 @@ AI_Function1_Move(Entity *ent, int location)
 	}
 	else
 	{
-		ent->pos.y = ent->pos.y + ent->rise_run.y;
+		ent->pos.y = sin(ent->rise_run.x) * 3 + ent->pos.y;
+	}
+
+
+
+
+}
+
+AI_Function1_Move(Entity *ent, int location)
+{
+	if (ent->pos.x < 0 || ent->pos.x>1150)
+	{
+		gf2d_entity_free_one(location);
+	}
+	else
+	{
+		ent->pos.x = cos(ent->rise_run.x) * 3 + ent->pos.x;
+
+	}
+	if (ent->pos.y < 0 || ent->pos.y>719)
+	{
+		gf2d_entity_free_one(location);
+	}
+	else
+	{
+		ent->pos.y = sin(ent->rise_run.x) * 3 + ent->pos.y;
 	}
 
 }

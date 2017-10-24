@@ -21,7 +21,9 @@ int main(int argc, char * argv[])
 	Sprite *enemy;
 	Entity *enter, *checker;
 
-    int mx,my, counter, boss;
+
+
+    int mx,my, counter, boss, endgame;
     float mf = 0;
     Sprite *mouse;
     Vector4D mouseColor = {255,100,255,200};
@@ -120,7 +122,7 @@ int main(int argc, char * argv[])
 
 		SoundVolume();
 
-		
+		endgame = 0;
 		starttime = SDL_GetTicks();
 		aichange= lengthofsong/numchuncks();
 		while (!done)
@@ -166,8 +168,8 @@ int main(int argc, char * argv[])
 				updateEnt();
 			
 			
-
-			drawEntity((int)mf, boss);
+			
+			drawEntity((int)mf, boss, endgame);
 
 			Ent_Hit();
 
@@ -179,6 +181,12 @@ int main(int argc, char * argv[])
 			draw_text((int)(lengthofsong-(currtime-starttime)/1000));
 
 			timer = (int)((currtime - starttime) / 1000);
+
+			if (timer == lengthofsong&& endgame==0)
+			{
+				Soundinit2();
+				endgame = 1;
+			}
 			slog("%i", timer);
 			if (timer > aichange)
 			{
