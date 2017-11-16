@@ -5,6 +5,9 @@
 #include "entity.h"
 #include <stdio.h>
 
+
+gamestate *CurrGamestate;
+
 int main(int argc, char * argv[])
 {
     /*variable declarations*/
@@ -15,6 +18,8 @@ int main(int argc, char * argv[])
 	int spawncontroller = 10;
 	int aichange, timer;
 	int aitype=1;
+	int playerhealth = 100;
+	long biggestamp = 0;
 	
 	const Uint8 * keys;
 	Sprite *sprite, *sprite1, *deleteme,*startscreen, *endscreen;
@@ -33,6 +38,7 @@ int main(int argc, char * argv[])
 	double starttime, currtime;
 	counter = 0;
 	
+	file = fopen("test2.wav", "rb");
 
     /*program initializtion*/
     init_logger("gf2d.log");
@@ -51,16 +57,15 @@ int main(int argc, char * argv[])
     
     /*demo setup*/
     
-    mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16);
-	startscreen = gf2d_sprite_load_image("images/backgrounds/foolsLogic.jpg");
+    
+	
 
 	endscreen = gf2d_sprite_load_image("images/backgrounds/end screen.png");
 	//enemy = gf2d_sprite_load_all("images/pointer.png", 32, 32, 16);
     /*main game loop*/
 	
-	deleteme = gf2d_sprite_load_image("images/ui/health bar.png");
-
 	
+	Soundinit();//init the sound
 	//setup test entity 
 	//update entity
 	int done1 = 0;
@@ -69,27 +74,11 @@ int main(int argc, char * argv[])
 
 		while (!done1)
 		{
-			SDL_PumpEvents();   // update SDL's internal event structures
-			keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
+			
 			gf2d_graphics_clear_screen();// clears drawing buffers
 
-			// all drawing should happen betweem clear_screen and next_frame
-			//backgrounds drawn first
-
-			gf2d_graphics_clear_screen();
-			gf2d_sprite_draw_image(startscreen, vector2d(0, 0));
-
-
-
-
-			gf2d_grahics_next_frame();// render current draw frame and skip to the next frame
-
-			if (keys[SDL_SCANCODE_RETURN])done1 = 1; // exit condition
-			if (keys[SDL_SCANCODE_ESCAPE])
-			{
-				reallydone = 1;
-				break;
-			}
+			
+			
 		}
 		if (reallydone)
 		{
@@ -105,18 +94,20 @@ int main(int argc, char * argv[])
 		init_UI();
 		
 		
-		Soundinit();//init the sound
+		
 		//end loading
 		
 		boss = selectlevel();//select the level
 
 
 
-		gf2d_entity_init(boss, 230000);
-
+		fseek(file, 0, SEEK_SET);
 		
-		file = fopen("test2.wav","rb");
-		Soundinfo(file);
+		
+
+		biggestamp=Soundinfo(file);
+
+		gf2d_entity_init(boss, biggestamp);
 
 		lengthofsong = timeofsong();
 
@@ -125,12 +116,12 @@ int main(int argc, char * argv[])
 		endgame = 0;
 		starttime = SDL_GetTicks();
 		aichange= lengthofsong/numchuncks();
+		
 		while (!done)
 		{
 			SDL_PumpEvents();   // update SDL's internal event structures
 			keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
 			/*update things here*/
-			SDL_GetMouseState(&mx, &my);
 			mf += 0.1;
 			if (mf >= 21.0)
 			{
@@ -158,24 +149,23 @@ int main(int argc, char * argv[])
 
 
 
-			if (spawncontroller==10)
+			if (spawncontroller>10)
 			{
 				spawncontroller = 0;
 			    gf2d_entity_spawn(aitype);
 	     	}
-			spawncontroller++;
+			spawncontroller+=7;
 			
-				updateEnt();
-			
-			
+			updateEnt();
 			
 			drawEntity((int)mf, boss, endgame);
 
-			Ent_Hit();
-
+			playerhealth= Ent_Hit();
+			//slog("this is player health %i", playerhealth);
 			//UI elements last
-			draw_UI(0.3);
-
+			draw_UI(playerhealth);
+			if (playerhealth < 0)
+				done = 1;
 
 			currtime = SDL_GetTicks();
 			draw_text((int)(lengthofsong-(currtime-starttime)/1000));
@@ -187,7 +177,7 @@ int main(int argc, char * argv[])
 				Soundinit2();
 				endgame = 1;
 			}
-			slog("%i", timer);
+//			slog("%i", timer);
 			if (timer > aichange)
 			{
 				aichange = aichange + (lengthofsong / numchuncks());
@@ -199,6 +189,15 @@ int main(int argc, char * argv[])
 				if (aitype > 4)
 					aitype = 2;
 
+				
+			}
+
+			slog("\n\n the aichange is %i\n", aichange);
+			
+			if ((int)(lengthofsong - timer) <= -7)
+			{
+				done1 = 1;
+				done = 1;
 			}
 
 			gf2d_grahics_next_frame();// render current draw frame and skip to the next frame
@@ -220,13 +219,17 @@ int main(int argc, char * argv[])
 		{
 			break;
 		}
-
+		Soundclose();
 		
+		
+
 		aichange = 0;
 		timer = 0;
 		aitype = 1;
-		Soundclose();
+		
 		gf2d_entity_free();
+		currtime = 0;
+		starttime = 0;
 
 		while (!done)
 		{

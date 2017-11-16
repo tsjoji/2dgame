@@ -1,6 +1,10 @@
 #include "gf2d_sprite.h"
 #include "gf2d_vector.h"
 
+enum ident{bullet, player, boss, powerup1, powerup2, powerup3};
+
+
+
 //entity based game
 typedef struct Entity_S
 {
@@ -16,13 +20,23 @@ typedef struct Entity_S
 	int invcib;/**<invcibility to the player*/
 	int damaging;/**<enemy bullet able to dmg*/
 	int inuse;/**checks to see if memory is in use */
-	int type;/**<1 is player, 2 is boss, , 3 is beam1, 4 is beam2, else bullet*/
+	enum ident type;/**<1 is player, 2 is boss, , 3 is beam1, 4 is powerup1, 5 is powerup2, 6 is powerup3, else bullet*/
 	float frame;/**<what frame the sprite is on*/
 	float delta;/**<how fast to change each frames*/
 	int maxFrames;/**<max frames*/
 	int identity;/**<unique pattern for rot2x 0-12*/
+	int powerupl;/**<how much power is available*/
 }Entity;
 
+
+typedef struct gamestate_S{
+
+	void(*input)();
+	void(*update)();
+	void(*draw)();
+	struct gamestate *parent;
+
+}gamestate;
 
 /*
 *@ mallocs and memsets array of x entities to 0
@@ -35,6 +49,20 @@ void gf2d_entity_init(int boss);
 *@ right now since there are no spawning conditons will just spawn as many as possible if they are not in use
 */
 void gf2d_entity_spawn();
+
+
+/*
+*@ spawns the enemies
+*@ if off screen free the ent
+*@
+*/
+void AI_Function2_Move(Entity *ent, int location);
+
+void AI_Function3_Move(Entity *ent, int location);
+
+void AI_Function1_Move(Entity *ent, int location);
+
+void AI_Function4_Move(Entity *ent, int location);
 
 /*
 *@ checks if the entity is in use if true will draw them
@@ -54,7 +82,7 @@ void updateEnt();
 *@ checks to see if any entity is hitting the player
 *@
 */
-void Ent_Hit();
+int Ent_Hit();
 
 /*
 *@ frees all memory in the structure except the player

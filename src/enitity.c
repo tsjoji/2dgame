@@ -39,7 +39,7 @@ EntityMan entity_manager;
 /*
 *@ first entity will always be the player
 */
-void gf2d_entity_init(int boss, int amplitude)
+void gf2d_entity_init(int boss, long amplitude)
 {
 	int modulation = 17;
 	int counter = 0;
@@ -55,14 +55,14 @@ void gf2d_entity_init(int boss, int amplitude)
 	spawner_y = amplitude % 200;//will spawn the location for the AI1 function
 	while (1)
 	{
-		AI2_speed = amplitude%modulation;
-		if (AI2_speed<20 && AI2_speed>13)
+		AI2_speed = abs(amplitude)%modulation;
+		if (AI2_speed<30 && AI2_speed>13)
 			break;
 		else
 			modulation++;
 
 	}
-	
+	entity_manager.EntityList[0]->health=100;
 
 
 }
@@ -98,31 +98,14 @@ void gf2d_entity_spawn(int AI_Pattern)//AI function 1
 					entity_manager.EntityList[counter]->delta = 0.07;
 					entity_manager.EntityList[counter]->pos.x = 1050;
 					entity_manager.EntityList[counter]->pos.y = 650;
-					entity_manager.EntityList[counter]->rise_run.x = deltax;
+					entity_manager.EntityList[counter]->rise_run.x = deltax+AI2_speed;
 					entity_manager.EntityList[counter]->rise_run.y = 1;
 					entity_manager.EntityList[counter]->scale = 1.0;
 					break;
 
 				}
 
-				for (counter; counter < entitySize; counter++)
-				{
-					if (entity_manager.EntityList[counter]->inuse == 0)
-					{
-						deltax++;
-						entity_manager.EntityList[counter]->inuse = 1;
-						entity_manager.EntityList[counter]->maxFrames = 3;
-						entity_manager.EntityList[counter]->frame = 0;
-						entity_manager.EntityList[counter]->delta = 0.07;
-						entity_manager.EntityList[counter]->pos.x = 20;
-						entity_manager.EntityList[counter]->pos.y = 650;
-						entity_manager.EntityList[counter]->scale = 1;
-						entity_manager.EntityList[counter]->rise_run.x = -deltax;
-						entity_manager.EntityList[counter]->rise_run.y = -1.0;
-						break;
-
-					}
-				}
+				
 
 				if (180 < deltax)
 					deltax = 1;
@@ -132,7 +115,27 @@ void gf2d_entity_spawn(int AI_Pattern)//AI function 1
 
 				entity_manager.EntityList[0]->maxFrames = 1;
 			}
+			for (counter; counter < entitySize; counter++)
+			{
+				if (entity_manager.EntityList[counter]->inuse == 0)
+				{
+					deltax++;
+					entity_manager.EntityList[counter]->inuse = 1;
+					entity_manager.EntityList[counter]->maxFrames = 3;
+					entity_manager.EntityList[counter]->frame = 0;
+					entity_manager.EntityList[counter]->delta = 0.07;
+					entity_manager.EntityList[counter]->pos.x = 20;
+					entity_manager.EntityList[counter]->pos.y = 650;
+					entity_manager.EntityList[counter]->scale = 1;
+					entity_manager.EntityList[counter]->rise_run.x = -deltax + AI2_speed;
+					entity_manager.EntityList[counter]->rise_run.y = -1.0;
+					break;
 
+				}
+
+				if (180 < deltax)
+					deltax = 1;
+			}
 			
 		}
 	}
@@ -150,31 +153,14 @@ void gf2d_entity_spawn(int AI_Pattern)//AI function 1
 				entity_manager.EntityList[counter]->delta = 0.07;
 				entity_manager.EntityList[counter]->pos.x = spawner_x + AI2_leftx;
 				entity_manager.EntityList[counter]->pos.y = spawner_y + AI2_y;
-				entity_manager.EntityList[counter]->rise_run.x = deltax;
+				entity_manager.EntityList[counter]->rise_run.x = deltax + AI2_speed;
 				entity_manager.EntityList[counter]->rise_run.y = 1;
 				entity_manager.EntityList[counter]->scale = 1.0;
 				break;
 				
 			}
 
-			for (counter; counter < entitySize; counter++)
-			{
-				if (entity_manager.EntityList[counter]->inuse == 0)
-				{
-					deltax++;
-					entity_manager.EntityList[counter]->inuse = 1;
-					entity_manager.EntityList[counter]->maxFrames = 3;
-					entity_manager.EntityList[counter]->frame = 0;
-					entity_manager.EntityList[counter]->delta = 0.07;
-					entity_manager.EntityList[counter]->pos.x = spawner_x + AI2_rightx;
-					entity_manager.EntityList[counter]->pos.y = spawner_y + AI2_y;
-					entity_manager.EntityList[counter]->scale = 1;
-					entity_manager.EntityList[counter]->rise_run.x = -deltax;
-					entity_manager.EntityList[counter]->rise_run.y = -1.0;
-					break;
-					
-				}
-			}
+			
 			
 			if (deltamax < deltax)
 				deltax = 1;
@@ -183,6 +169,32 @@ void gf2d_entity_spawn(int AI_Pattern)//AI function 1
 
 
 			entity_manager.EntityList[0]->maxFrames = 1;
+		}
+		for (counter; counter < entitySize; counter++)
+		{
+			if (entity_manager.EntityList[counter]->inuse == 0)
+			{
+				deltax++;
+				entity_manager.EntityList[counter]->inuse = 1;
+				entity_manager.EntityList[counter]->maxFrames = 3;
+				entity_manager.EntityList[counter]->frame = 0;
+				entity_manager.EntityList[counter]->delta = 0.07;
+				entity_manager.EntityList[counter]->pos.x = spawner_x + AI2_rightx;
+				entity_manager.EntityList[counter]->pos.y = spawner_y + AI2_y;
+				entity_manager.EntityList[counter]->scale = 1;
+				entity_manager.EntityList[counter]->rise_run.x = deltax + AI2_speed;
+				entity_manager.EntityList[counter]->rise_run.y = 1.0;
+				break;
+
+			}
+			if (deltamax < deltax)
+				deltax = 1;
+
+
+
+
+			entity_manager.EntityList[0]->maxFrames = 1;
+
 		}
 	}
 
@@ -205,31 +217,14 @@ void gf2d_entity_spawn(int AI_Pattern)//AI function 1
 					entity_manager.EntityList[counter]->delta = 0.07;
 					entity_manager.EntityList[counter]->pos.x = spawner_x + AI3_x;
 					entity_manager.EntityList[counter]->pos.y = spawner_y + AI3_y;
-					entity_manager.EntityList[counter]->rise_run.x = deltax;
+					entity_manager.EntityList[counter]->rise_run.x = deltax + AI2_speed;
 					entity_manager.EntityList[counter]->rise_run.y = 1;
 					entity_manager.EntityList[counter]->scale = 1.0;
 					break;
 					
 				}
 
-				for (counter; counter < entitySize; counter++)
-				{
-					if (entity_manager.EntityList[counter]->inuse == 0)
-					{
-						deltax++;
-						entity_manager.EntityList[counter]->inuse = 1;
-						entity_manager.EntityList[counter]->maxFrames = 3;
-						entity_manager.EntityList[counter]->frame = 0;
-						entity_manager.EntityList[counter]->delta = 0.07;
-						entity_manager.EntityList[counter]->pos.x = spawner_x + AI3_x;
-						entity_manager.EntityList[counter]->pos.y = spawner_y + AI3_y2;
-						entity_manager.EntityList[counter]->scale = 1;
-						entity_manager.EntityList[counter]->rise_run.x = -deltax;
-						entity_manager.EntityList[counter]->rise_run.y = -1.0;
-						break;
-						
-					}
-				}
+				
 
 				
 			
@@ -241,6 +236,34 @@ void gf2d_entity_spawn(int AI_Pattern)//AI function 1
 
 				entity_manager.EntityList[0]->maxFrames = 1;
 			}
+			for (counter; counter < entitySize; counter++)
+			{
+				if (entity_manager.EntityList[counter]->inuse == 0)
+				{
+					deltax++;
+					entity_manager.EntityList[counter]->inuse = 1;
+					entity_manager.EntityList[counter]->maxFrames = 3;
+					entity_manager.EntityList[counter]->frame = 0;
+					entity_manager.EntityList[counter]->delta = 0.07;
+					entity_manager.EntityList[counter]->pos.x = spawner_x + AI3_x;
+					entity_manager.EntityList[counter]->pos.y = spawner_y + AI3_y2;
+					entity_manager.EntityList[counter]->scale = 1;
+					entity_manager.EntityList[counter]->rise_run.x = -deltax + AI2_speed;
+					entity_manager.EntityList[counter]->rise_run.y = -1.0;
+					break;
+
+				}
+				if (deltamax < deltax)
+					deltax = 1;
+
+
+
+
+				entity_manager.EntityList[0]->maxFrames = 1;
+
+			}
+
+
 			for (counter = 3; counter<5; counter++)
 			{
 				if (entity_manager.EntityList[counter]->inuse == 0)
@@ -277,31 +300,14 @@ void gf2d_entity_spawn(int AI_Pattern)//AI function 1
 				entity_manager.EntityList[counter]->delta = 0.07;
 				entity_manager.EntityList[counter]->pos.x = 500;
 				entity_manager.EntityList[counter]->pos.y = spawner_y + AI2_y;
-				entity_manager.EntityList[counter]->rise_run.x = deltax;
+				entity_manager.EntityList[counter]->rise_run.x = deltax + AI2_speed;
 				entity_manager.EntityList[counter]->rise_run.y = 1;
 				entity_manager.EntityList[counter]->scale = 1.0;
 				break;
 
 			}
 
-			for (counter; counter < entitySize; counter++)
-			{
-				if (entity_manager.EntityList[counter]->inuse == 0)
-				{
-					deltax++;
-					entity_manager.EntityList[counter]->inuse = 1;
-					entity_manager.EntityList[counter]->maxFrames = 3;
-					entity_manager.EntityList[counter]->frame = 0;
-					entity_manager.EntityList[counter]->delta = 0.07;
-					entity_manager.EntityList[counter]->pos.x = 600;
-					entity_manager.EntityList[counter]->pos.y = spawner_y + AI2_y;
-					entity_manager.EntityList[counter]->scale = 1;
-					entity_manager.EntityList[counter]->rise_run.x = -deltax;
-					entity_manager.EntityList[counter]->rise_run.y = -1.0;
-					break;
-
-				}
-			}
+			
 
 			if (deltamax < deltax)
 				deltax = 1;
@@ -310,6 +316,32 @@ void gf2d_entity_spawn(int AI_Pattern)//AI function 1
 
 
 			entity_manager.EntityList[0]->maxFrames = 1;
+		}
+		for (counter; counter < entitySize; counter++)
+		{
+			if (entity_manager.EntityList[counter]->inuse == 0)
+			{
+				deltax++;
+				entity_manager.EntityList[counter]->inuse = 1;
+				entity_manager.EntityList[counter]->maxFrames = 3;
+				entity_manager.EntityList[counter]->frame = 0;
+				entity_manager.EntityList[counter]->delta = 0.07;
+				entity_manager.EntityList[counter]->pos.x = 600;
+				entity_manager.EntityList[counter]->pos.y = spawner_y + AI2_y;
+				entity_manager.EntityList[counter]->scale = 1;
+				entity_manager.EntityList[counter]->rise_run.x = -deltax + AI2_speed;
+				entity_manager.EntityList[counter]->rise_run.y = -1.0;
+				break;
+
+			}
+			if (deltamax < deltax)
+				deltax = 1;
+
+
+
+
+			entity_manager.EntityList[0]->maxFrames = 1;
+
 		}
 	}
 
@@ -419,24 +451,29 @@ void updateEnt()
 
 }
 
-void Ent_Hit()
+int Ent_Hit()
 {
 	int counter;
 	for (counter = 2; counter < entitySize; counter++)
 	{
-
+		
 		if (entity_manager.EntityList[0]->pos.x >= (entity_manager.EntityList[counter]->pos.x - 16) &&
 			entity_manager.EntityList[0]->pos.x <= (entity_manager.EntityList[counter]->pos.x + 16) &&
 			entity_manager.EntityList[0]->pos.y >= (entity_manager.EntityList[counter]->pos.y - 16) &&
 			entity_manager.EntityList[0]->pos.y <= (entity_manager.EntityList[counter]->pos.y + 16)
 			)
 		{
-			gf2d_entity_free_one(counter);
+		
+		
+
+			entity_manager.EntityList[0]->health = entity_manager.EntityList[0]->health-2;
+			return entity_manager.EntityList[0]->health;
 		}
+     
 
-
-		//gf2d_sprite_draw_image(entity_manager.EntityList[counter]->img, vector2d(250, 300));
+		
 	}
+	return entity_manager.EntityList[0]->health;
 }
 
 
@@ -494,7 +531,7 @@ void gf2d_rotTransx2(Entity *ent)
 	if (ent->theta == NULL)ent->theta = atan(ent->pos.y, ent->pos.x);
 	xf = (0.98*(ent->time*cos(ent->theta) + ent->time* ent->time*sin(ent->theta) + ent->pos.x)) ;
 	yf = (0.98*(ent->time*sin(ent->theta) + ent->time * ent->time*cos(ent->theta) + ent->pos.y))*1.02;
-	if (xf < 0 || xf>1150)
+	if (xf < -150 || xf>1150)
 	{
 		gf2d_entity_free_one(ent);
 	}
@@ -502,7 +539,7 @@ void gf2d_rotTransx2(Entity *ent)
 	{
 		ent->pos.x = xf;
 	}
-	if (yf < 0 || yf>719)
+	if (yf < -150 || yf>719)
 	{
 		gf2d_entity_free_one(ent);
 	}
@@ -515,10 +552,10 @@ void gf2d_rotTransx2(Entity *ent)
 
 
 
-AI_Function2_Move(Entity *ent, int location)
+void AI_Function2_Move(Entity *ent, int location)
 {
 	
-	if (ent->pos.x < 0 || ent->pos.x>1150)
+	if (ent->pos.x < -150 || ent->pos.x>1150)
 	{
 		gf2d_entity_free_one(location);
 	}
@@ -527,7 +564,7 @@ AI_Function2_Move(Entity *ent, int location)
 		ent->pos.x =  cos(ent->rise_run.x) * 3 + ent->pos.x;
 		
 	}
-	if (ent->pos.y < 0 || ent->pos.y>719)
+	if (ent->pos.y < -150 || ent->pos.y>719)
 	{
 		gf2d_entity_free_one(location);
 	}
@@ -542,10 +579,10 @@ AI_Function2_Move(Entity *ent, int location)
 }
 
 
-AI_Function4_Move(Entity *ent, int location)
+void AI_Function4_Move(Entity *ent, int location)
 {
 
-	if (ent->pos.x < 0 || ent->pos.x>1150)
+	if (ent->pos.x < -150 || ent->pos.x>1150)
 	{
 		gf2d_entity_free_one(location);
 	}
@@ -554,7 +591,7 @@ AI_Function4_Move(Entity *ent, int location)
 		ent->pos.x = cos(ent->rise_run.x) * 3 + ent->pos.x;
 
 	}
-	if (ent->pos.y < 0 || ent->pos.y>719)
+	if (ent->pos.y < -150 || ent->pos.y>719)
 	{
 		gf2d_entity_free_one(location);
 	}
@@ -568,9 +605,9 @@ AI_Function4_Move(Entity *ent, int location)
 
 }
 
-AI_Function1_Move(Entity *ent, int location)
+void AI_Function1_Move(Entity *ent, int location)
 {
-	if (ent->pos.x < 0 || ent->pos.x>1150)
+	if (ent->pos.x < -150 || ent->pos.x>1150)
 	{
 		gf2d_entity_free_one(location);
 	}
@@ -579,7 +616,7 @@ AI_Function1_Move(Entity *ent, int location)
 		ent->pos.x = cos(ent->rise_run.x) * 3 + ent->pos.x;
 
 	}
-	if (ent->pos.y < 0 || ent->pos.y>719)
+	if (ent->pos.y < -150 || ent->pos.y>719)
 	{
 		gf2d_entity_free_one(location);
 	}
@@ -591,11 +628,11 @@ AI_Function1_Move(Entity *ent, int location)
 }
 
 
-AI_Function3_Move(Entity *ent, int location)
+void AI_Function3_Move(Entity *ent, int location)
 {
 	if (location > 5)
 	{
-		if (ent->pos.x < 0 || ent->pos.x>1150)
+		if (ent->pos.x < -150 || ent->pos.x>1150)
 		{
 			gf2d_entity_free_one(location);
 		}
@@ -604,7 +641,7 @@ AI_Function3_Move(Entity *ent, int location)
 			ent->pos.x = cos(ent->rise_run.x) * 3 + ent->pos.x;
 
 		}
-		if (ent->pos.y < 0 || ent->pos.y>719)
+		if (ent->pos.y < -150 || ent->pos.y>719)
 		{
 			gf2d_entity_free_one(location);
 		}
@@ -615,12 +652,12 @@ AI_Function3_Move(Entity *ent, int location)
 	}
 	else if (location >2)
 	{
-		if (ent->pos.x < 0 || ent->pos.x>1300)
+		if (ent->pos.x < -150 || ent->pos.x>1300)
 		{
 			gf2d_entity_free_one(location);
 		}
 		
-		if (ent->pos.y < 0 )
+		if (ent->pos.y < -150 )
 		{
 			return;
 		}
@@ -648,7 +685,7 @@ void gf2d_rotTransx3(Entity *ent)
 	xf = (ent->time*cos(ent->theta) + ent->time* ent->time*sin(ent->theta) + ent->pos.x) + (ent->pos.x*sin(30));
 	yf = (ent->time*sin(ent->theta) + ent->time * ent->time*cos(ent->theta) + ent->pos.y) + (ent->pos.y*cos(60));
 	ent->theta = ent->theta + 12000;
-	if (xf < 0 && xf>1280)
+	if (xf < -150 && xf>1280)
 	{
 		gf2d_entity_free(ent);
 	}
@@ -656,7 +693,7 @@ void gf2d_rotTransx3(Entity *ent)
 	{
 		ent->pos.x = xf;
 	}
-	if (yf < 0 && yf>1280)
+	if (yf < -150 && yf>1280)
 	{
 		gf2d_entity_free(ent);
 	}
