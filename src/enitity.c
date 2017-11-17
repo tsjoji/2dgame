@@ -48,8 +48,8 @@ void gf2d_entity_init(int boss, long amplitude)
 		entity_manager.EntityList[counter] = (Entity *)malloc(sizeof(Entity));
 		memset(entity_manager.EntityList[counter], 0, sizeof(Entity));
 	}
-	entity_manager.EntityList[0]->type = 1;//player
-	entity_manager.EntityList[1]->type = 2;//boss
+	entity_manager.EntityList[0]->type = player;//player
+	entity_manager.EntityList[1]->type = Boss;//boss
 	entity_manager.EntityList[1]->damaging = boss;
 	spawner_x = amplitude % 100;//will spawn the location for the AI1 function
 	spawner_y = amplitude % 200;//will spawn the location for the AI1 function
@@ -67,7 +67,7 @@ void gf2d_entity_init(int boss, long amplitude)
 
 }
 
-int test = 0;
+int test1 = 0;
 
 int verticaldelta = 0;
 int horizontaldelta = 0;
@@ -386,10 +386,10 @@ void drawEntity(int mf, int boss, int endgame)
 			else 
 				entity_manager.EntityList[counter]->img = gf2d_sprite_load_all("images/projectiles/ball_2.png", 102, 115, 3);
 
-			if (!test)
+			if (!test1)
 			{
 				//gf2d_sprite_draw_image(entity_manager.EntityList[counter]->img, vector2d(12, 350));
-				test++;
+				test1++;
 			}
 
 			entity_manager.EntityList[counter]->frame = entity_manager.EntityList[counter]->frame + entity_manager.EntityList[counter]->delta;

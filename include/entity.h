@@ -1,8 +1,9 @@
 #include "gf2d_sprite.h"
 #include "gf2d_vector.h"
 
-enum ident{bullet, player, boss, powerup1, powerup2, powerup3};
+enum ident{bullet, player, Boss, powerup1, powerup2, powerup3};
 
+enum gametype{ Mainmenu, Game, Loser, Winner, Options };
 
 
 //entity based game
@@ -34,7 +35,7 @@ typedef struct gamestate_S{
 	void(*input)();
 	void(*update)();
 	void(*draw)();
-	struct gamestate *parent;
+	struct gamestate_S *parent;
 
 }gamestate;
 
