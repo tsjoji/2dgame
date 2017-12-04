@@ -26,7 +26,7 @@ typedef struct Entity_S
 	float delta;/**<how fast to change each frames*/
 	int maxFrames;/**<max frames*/
 	int identity;/**<unique pattern for rot2x 0-12*/
-	int powerupl;/**<how much power is available*/
+	int powerup;/**<how much power is available*/
 }Entity;
 
 
@@ -44,6 +44,8 @@ typedef struct gamestate_S{
 *@
 */
 void gf2d_entity_init(int boss);
+
+void resetAI();
 
 /*
 *@ spawns the enemies
