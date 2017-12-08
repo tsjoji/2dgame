@@ -5,16 +5,22 @@
 #include "entity.h"
 #include <stdio.h>
 #include "gamestate.h"
-
+#include <windows.h>
 
 
 enum gametype currState = Mainmenu;
 
 gamestate *CurrGamestate;
 
+long deltatime = 0;
 
+#ifdef DEBUG
 int main(int argc, char * argv[])
+#elif RELEASE
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
+#endif
 {
+	long lastTime = SDL_GetTicks(),currTime;
 	setup();
 	
 	CurrGamestate = malloc(sizeof(gamestate));
@@ -44,7 +50,9 @@ int main(int argc, char * argv[])
 		(*CurrGamestate->input)();
 		(*CurrGamestate->update)();
 		(*CurrGamestate->draw)();
-		
+		currTime = SDL_GetTicks();
+		deltatime = currTime - lastTime;
+		lastTime = currTime;
 
 
 	}

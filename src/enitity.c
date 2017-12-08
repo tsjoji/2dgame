@@ -555,8 +555,10 @@ int Ent_Hit()
 	if (realdist < 800)
 	{
 		if (realdist < 675)
+		if (entity_manager.EntityList[0]->powerup<10000)
 			entity_manager.EntityList[0]->powerup = entity_manager.EntityList[0]->powerup + 60;
 		else
+		if (entity_manager.EntityList[0]->powerup<10000)
 			entity_manager.EntityList[0]->powerup = entity_manager.EntityList[0]->powerup + 5;
 	}
 
