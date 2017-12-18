@@ -9,7 +9,9 @@ enum gametype{ Mainmenu, Game, Loser, Winner, Options };
 //entity based game
 typedef struct Entity_S
 {
-	
+	int healthregen;
+	int powerbarregen;
+	int armor;
 	Sprite *img;/** pointer to the entity img*/
 	int health;/** how much health player has*/
 	int scale;/** how uch to scale null will indicate no change*/

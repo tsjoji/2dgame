@@ -20,7 +20,7 @@
 #define AI3_x 10
 
 
-
+extern int slowdownsong;
 int AI2_speed=0;
 int signx = 0;
 int signy = 1;
@@ -65,8 +65,10 @@ void gf2d_entity_init(int boss, long amplitude)
 
 	}
 	entity_manager.EntityList[0]->health=10000;
-	entity_manager.EntityList[0]->powerup = 0;
-
+	entity_manager.EntityList[0]->powerup = 100000000000;
+	entity_manager.EntityList[0]->pos.x = 200;
+	entity_manager.EntityList[0]->pos.y = 400;
+	entity_manager.EntityList[0]->armor = 0;
 }
 
 int test1 = 0;
@@ -375,7 +377,13 @@ void drawEntity(int mf, int boss, int endgame)
 
 			//player
 			if (entity_manager.EntityList[counter]->type == 1)
+			{
+				if (entity_manager.EntityList[counter]->armor==0)
 				entity_manager.EntityList[counter]->img = gf2d_sprite_load_all("images/bosses/player.png", 96, 96, 0);
+				else
+					entity_manager.EntityList[counter]->img = gf2d_sprite_load_all("images/bosses/playerarmor.png", 96, 96, 0);
+			}
+				
 			//boss
 			else if (entity_manager.EntityList[counter]->type == 2)
 			{
@@ -463,8 +471,7 @@ void updateEnt()
 		//gf2d_sprite_draw_image(entity_manager.EntityList[counter]->img, vector2d(250, 300));
 	}
 
-	entity_manager.EntityList[0]->pos.x = mx;
-	entity_manager.EntityList[0]->pos.y = my;
+	
 	entity_manager.EntityList[1]->pos.x = 360;
 	entity_manager.EntityList[1]->pos.y = 100;
 
@@ -537,8 +544,10 @@ int Ent_Hit()
 		{
 		
 		
-
-			entity_manager.EntityList[0]->health = entity_manager.EntityList[0]->health-70;
+			if (entity_manager.EntityList[0]->armor==0)
+				entity_manager.EntityList[0]->health = entity_manager.EntityList[0]->health-60;
+			else
+				entity_manager.EntityList[0]->health = entity_manager.EntityList[0]->health - 30;
 			return entity_manager.EntityList[0]->health;
 		}
 		else
@@ -565,6 +574,55 @@ int Ent_Hit()
 	return entity_manager.EntityList[0]->health;
 }
 
+
+void updateplayer(int xDir,int yDir)
+{
+	entity_manager.EntityList[0]->pos.x = entity_manager.EntityList[0]->pos.x + xDir * 2.5;
+	entity_manager.EntityList[0]->pos.y = entity_manager.EntityList[0]->pos.y + yDir * 2.5;
+}
+
+
+
+void updateplayermouse()
+{
+	int mx, my;
+	SDL_GetMouseState(&mx, &my);
+
+	entity_manager.EntityList[0]->pos.x = mx;
+	entity_manager.EntityList[0]->pos.y = my;
+
+}
+
+void regen()
+{
+	if (entity_manager.EntityList[0]->healthregen)
+	{
+		if (entity_manager.EntityList[0]->health < 10000)
+			entity_manager.EntityList[0]->health += 100;
+	}
+	if (entity_manager.EntityList[0]->powerbarregen)
+	{
+		if (entity_manager.EntityList[0]->powerup < 10000)
+			entity_manager.EntityList[0]->powerup += 1;
+	}
+}
+
+void randompowerup()
+{
+	int r = rand()%3;
+	if (r == 0)
+		entity_manager.EntityList[0]->healthregen = 1;
+	if (r == 1)
+	{
+		entity_manager.EntityList[0]->powerbarregen = 1;
+	}
+	if (r == 2)
+	{
+		entity_manager.EntityList[0]->armor = 1;
+	}
+
+
+}
 
 /*
 *@ frees all memory in the structure minus player
@@ -593,9 +651,56 @@ void gf2d_entity_free_one(int remove)
 	memset(entity_manager.EntityList[remove], 0, sizeof(Entity));
 }
 
+void smallcircle()
+{
+	
+	int counter, realdist = 1000, test2, test3, test4;
+	if (entity_manager.EntityList[0]->powerup>=500)
+	{
+		entity_manager.EntityList[0]->powerup -= 500;
+		for (counter = 5; counter < entitySize; counter++)
+		{
+
+			test2 = dst(entity_manager.EntityList[0]->pos.x, entity_manager.EntityList[0]->pos.y, (entity_manager.EntityList[counter]->pos.x), (entity_manager.EntityList[counter]->pos.y));
+			if (test2 < 5000)
+			{
+				gf2d_entity_free_one(counter);
+			}
+
+		}
+	}
+
+}
+
+void killallbubbles()
+{
+	int counter, realdist = 1000, test2, test3, test4;
+	if (entity_manager.EntityList[0]->powerup >= 5000)
+	{
+		entity_manager.EntityList[0]->powerup -= 5000;
+		for(counter = 5; counter < entitySize; counter++)
+		{
 
 
+			gf2d_entity_free_one(counter);
 
+
+		}
+	}
+}
+
+int reposong(double time)
+{
+	int enough = 0;
+	int times = (int)(time*1000) + 30000;
+	if (entity_manager.EntityList[0]->powerup >= 9000)
+	{
+		enough = 1;
+		entity_manager.EntityList[0]->powerup -= 9000;
+		fastforward(times);
+	}
+	return enough;
+}
 
 static int delta = 0;
 void damageplayer(int dmg)
@@ -647,8 +752,10 @@ void AI_Function2_Move(Entity *ent, int location)
 	}
 	else
 	{
+		if (slowdownsong)
 		ent->pos.x =  cos(ent->rise_run.x) * 3 + ent->pos.x;
-		
+		else
+			ent->pos.x = cos(ent->rise_run.x) * 2.1 + ent->pos.x;
 	}
 	if (ent->pos.y < -150 || ent->pos.y>719)
 	{
@@ -656,7 +763,10 @@ void AI_Function2_Move(Entity *ent, int location)
 	}
 	else
 	{
+		if (slowdownsong)
 		ent->pos.y = sin(ent->rise_run.x) * 3 + ent->pos.y;
+		else
+	    ent->pos.y = sin(ent->rise_run.x) * 2.1 + ent->pos.y;
 	}
 
 
@@ -674,7 +784,10 @@ void AI_Function4_Move(Entity *ent, int location)
 	}
 	else
 	{
-		ent->pos.x = cos(ent->rise_run.x) * 3 + ent->pos.x;
+		if (slowdownsong)
+			ent->pos.x = cos(ent->rise_run.x) * 3 + ent->pos.x;
+		else
+			ent->pos.x = cos(ent->rise_run.x) * 2.1 + ent->pos.x;
 
 	}
 	if (ent->pos.y < -150 || ent->pos.y>719)
@@ -683,7 +796,10 @@ void AI_Function4_Move(Entity *ent, int location)
 	}
 	else
 	{
-		ent->pos.y = sin(ent->rise_run.y) * 3 + ent->pos.y;
+		if (slowdownsong)
+			ent->pos.y = sin(ent->rise_run.y) * 3 + ent->pos.y;
+		else
+			ent->pos.y= sin(ent->rise_run.y) * 2.1 + ent->pos.y;
 	}
 
 
@@ -704,7 +820,10 @@ void AI_Function1_Move(Entity *ent, int location)
 		}
 		else
 		{
-			ent->pos.x = cos(ent->rise_run.x)*2.5 + ent->pos.x;
+			if (slowdownsong)
+				ent->pos.x = cos(ent->rise_run.x) * 2.5 + ent->pos.x;
+			else
+				ent->pos.x = cos(ent->rise_run.x) * 1.75 + ent->pos.x;
 			//slog("ur x pos is %lf",ent->rise_run.x);
 
 		}
@@ -714,7 +833,11 @@ void AI_Function1_Move(Entity *ent, int location)
 		}
 		else
 		{
-			ent->pos.y = sin(ent->rise_run.y)*2.5 + ent->pos.y;
+			if (slowdownsong)
+				ent->pos.y = sin(ent->rise_run.y) * 2.5 + ent->pos.y;
+			else
+				ent->pos.y = sin(ent->rise_run.y) * 1.75 + ent->pos.y;
+			
 			//slog("ur y pos is %lf", ent->rise_run.y);
 		}
 	}
