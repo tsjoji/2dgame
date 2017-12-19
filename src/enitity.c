@@ -38,9 +38,7 @@ typedef struct
 
 EntityMan entity_manager;
 
-/*
-*@ first entity will always be the player
-*/
+
 void gf2d_entity_init(int boss, long amplitude)
 {
 	int modulation = 17;
@@ -76,6 +74,7 @@ int verticaldelta = 0;
 int horizontaldelta = 0;
 int AItype = 0;
 int AI1_Switch = 0;
+
 void gf2d_entity_spawn(int AI_Pattern)//AI function 1
 {
 	Vector4D mouseColor = { 255, 100, 255, 200 };
@@ -703,10 +702,7 @@ int reposong(double time)
 }
 
 static int delta = 0;
-void damageplayer(int dmg)
-{
-	return;
-}
+
 
 
 
@@ -879,24 +875,6 @@ void AI_Function3_Move(Entity *ent, int location)
 		{
 			ent->pos.y = ent->pos.y + ent->rise_run.y;
 		}
-	}
-}
-
-
-
-
-
-
-
-/*
-*@sets x = 1 if x = 0
-*tan(arccos(x)+arcSin(y))=1
-*/
-void gf2d_crazyzone(Entity *ent)
-{
-	if (tan(acos(ent->pos.x) + asin(ent->pos.y) == 1))
-	{
-		damageplayer(10);//damage player 10 health
 	}
 }
 

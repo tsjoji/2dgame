@@ -1,7 +1,7 @@
 #include "gf2d_sprite.h"
 #include "gf2d_vector.h"
 
-enum ident{bullet, player, Boss, powerup1, powerup2, powerup3};
+enum ident{ bullet, player, Boss, powerup1, powerup2, powerup3 };
 
 enum gametype{ Mainmenu, Game, Loser, Winner, Options };
 
@@ -42,85 +42,169 @@ typedef struct gamestate_S{
 }gamestate;
 
 /*
-*@ mallocs and memsets array of x entities to 0
-*@
+*@brief inits the entity manager and selects the right boss
+*@param int boss
+*@returns void
 */
 void gf2d_entity_init(int boss);
 
-void resetAI();
 
-/*
-*@ spawns the enemies
-*@ right now since there are no spawning conditons will just spawn as many as possible if they are not in use
-*/
-void gf2d_entity_spawn();
+
+
 
 
 /*
-*@ spawns the enemies
-*@ if off screen free the ent
-*@
-*/
-void AI_Function2_Move(Entity *ent, int location);
-
-void AI_Function3_Move(Entity *ent, int location);
-
-void AI_Function1_Move(Entity *ent, int location);
-
-void AI_Function4_Move(Entity *ent, int location);
-
-/*
-*@ checks if the entity is in use if true will draw them
-*@
+*@brief draw entity
+*@param int mf
+*@returns void
 */
 void drawEntity(int mf);
 
 
 /*
-*@ changes x and y positions of each entity using the correct function if ai based
-*@if player will just get mouse location
+*@brief updates the entity
+*@param void
+*@returns void
 */
 void updateEnt();
 
 
 /*
-*@ checks to see if any entity is hitting the player
-*@
+*@brief checks to see if entity is hit and or nar enough to an enemy ot give power shield
+*@param void
+*@returns int
 */
 int Ent_Hit();
 
 /*
-*@ frees all memory in the structure except the player
-*@
+*@brief frees all enemies
+*@param void
+*@returns void
 */
 void gf2d_entity_free();
 
 /*
-*@ frees specific memory in the structure
-*@
+*@brief frees specific enitity
+*@param int remove
+*@returns void
 */
 void gf2d_entity_free_one(int remove);
 
+/*
+*@brief resets the ai pattern
+*@param void
+*@returns void
+*/
+void resetAI();
 
 /*
-*@ gives the player invicibility frames if damaged
+*@brief moves enity boss ai
+*@param Entity *ent, int location
+*@returns void
 */
-void damageplayer(int dmg);
+void AI_Function3_Move(Entity *ent, int location);
 
+/*
+*@brief moves entity first ai
+*@param Entity *ent, int location
+*@returns void
+*/
+void AI_Function1_Move(Entity *ent, int location);
+
+/*
+*@brief moves enity second ai
+*@param Entity *ent, int location
+*@returns void
+*/
+void AI_Function2_Move(Entity *ent, int location);
+
+/*
+*@brief moves enity boss ai
+*@param Entity *ent, int location
+*@returns void
+*/
+void AI_Function4_Move(Entity *ent, int location);
 
 
 /*
-*@ frees memory in the structure
-*@sets x = 1 if x = 0
-*xf=xcostheta-x^2costheta
-*yf=xcostheta+x^2costheta
+*@brief repositions song
+*@param double time
+*@returns int
 */
-void gf2d_rotTransx2(Entity *ent);
+int reposong(double time);
+
+/*
+*@brief kills all energy balls
+*@param void
+*@returns void
+*/
+void killallbubbles();
+
+/*
+*@brief kills all energy balls in a radius 5000 pixels from player
+*@param void
+*@returns void
+*/
+void smallcircle();
+
+/*
+*@brief gives player random powerup
+*@param void
+*@returns void
+*/
+void randompowerup();
 
 
 /*
-*@ frees memory in the structure
-*@sets x = 1 if x = 0
-*tan(arccos(x)+arcSin(y))=1
+*@brief if player has health or powerbar powerup regen it up to their max
+*@param void
+*@returns void
 */
-void gf2d_crazyzone(Entity *ent);
+void regen();
+
+/*
+*@brief updates player mouselocation
+*@param void
+*@returns void
+*/
+void updateplayermouse();
+
+/*
+*@brief if player is using a controller updates their location
+*@param int xDir, int yDir
+*@returns void
+*/
+void updateplayer(int xDir, int yDir);
+
+/*
+*@brief returns the powerbar
+*@param void
+*@returns void
+*/
+int getPowerbar();
+
+/*
+*@brief returns the distance from player to bullet squared
+*@param float player_x, float player_y, float bulletx, float bullety
+*@returns int
+*/
+int dst(float player_x, float player_y, float bulletx, float bullety);
+
+/*
+*@brief returns the distance from player to bullet squared more accurately than dst
+*@param float player_x, float player_y, float leftX, float leftY, float rightX, float rightY
+*@returns int
+*/
+int dst2(float player_x, float player_y, float leftX, float leftY, float rightX, float rightY);
+
+/*
+*@brief spawns and updates entities
+*@param int AI_Pattern
+*@returns void
+*/
+void gf2d_entity_spawn(int AI_Pattern);
+
+
+
+
+
