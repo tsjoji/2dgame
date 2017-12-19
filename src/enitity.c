@@ -708,38 +708,6 @@ void damageplayer(int dmg)
 	return;
 }
 
-/*
-*@ frees memory in the structure
-*@ sets x = 1 if x = 0
-*@ xf=xcostheta-x^2costheta
-*@ yf=xcostheta+x^2costheta
-*/
-void gf2d_rotTransx2(Entity *ent)
-{
-	double xf, yf;
-	ent->time += .01;
-	if (ent->pos.x < 0)ent->pos.x = 1.00;
-	if (ent->theta == NULL)ent->theta = atan(ent->pos.y, ent->pos.x);
-	xf = (0.98*(ent->time*cos(ent->theta) + ent->time* ent->time*sin(ent->theta) + ent->pos.x)) ;
-	yf = (0.98*(ent->time*sin(ent->theta) + ent->time * ent->time*cos(ent->theta) + ent->pos.y))*1.02;
-	if (xf < -150 || xf>1150)
-	{
-		gf2d_entity_free_one(ent);
-	}
-	else
-	{
-		ent->pos.x = xf;
-	}
-	if (yf < -150 || yf>719)
-	{
-		gf2d_entity_free_one(ent);
-	}
-	else
-	{
-		ent->pos.y = yf;
-	}
-
-}
 
 
 
@@ -916,39 +884,7 @@ void AI_Function3_Move(Entity *ent, int location)
 
 
 
-/*
-*@ frees memory in the structure
-*@ sets x = 1 if x = 0
-*@ xf=xcostheta-x^2costheta
-*@ yf=xcostheta+x^2costheta
-*/
-void gf2d_rotTransx3(Entity *ent)
-{
-	double xf, yf;
-	ent->time += .01;
-	if (ent->pos.x < 0)ent->pos.x = 1.00;
-	if (ent->theta == NULL)ent->theta = atan(ent->pos.y, ent->pos.x);
-	xf = (ent->time*cos(ent->theta) + ent->time* ent->time*sin(ent->theta) + ent->pos.x) + (ent->pos.x*sin(30));
-	yf = (ent->time*sin(ent->theta) + ent->time * ent->time*cos(ent->theta) + ent->pos.y) + (ent->pos.y*cos(60));
-	ent->theta = ent->theta + 12000;
-	if (xf < -150 && xf>1280)
-	{
-		gf2d_entity_free(ent);
-	}
-	else
-	{
-		ent->pos.x = xf;
-	}
-	if (yf < -150 && yf>1280)
-	{
-		gf2d_entity_free(ent);
-	}
-	else
-	{
-		ent->pos.y = yf;
-	}
 
-}
 
 
 
