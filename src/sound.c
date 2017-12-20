@@ -7,37 +7,59 @@
 #include <io.h>
 #include <string.h>
 
+//extern DECLSPEC int SDLCALL Mix_OpenAudioDevice(int frequency, Uint16 format, int nchannels, int chunksize, const char* device, int allowed_changes);
 
 #define TRUE 1 
 #define FALSE 0
-
 
 #define	BLOCK_SIZE 4096
 
 #define maxchunks 100
 #define OP_DBL_Digs 18
 
-
 SDL_AudioDeviceID deviceId;
 Uint8 *wavBuffer;
-
 
 unsigned char buffer4[4];
 unsigned char buffer2[2];
 
-
 int amplitude[maxchunks]; 
 int counter = 0;
+int *frequency;
 
 struct HEADER header;
 
 long chuncksize;
 
+Mix_Chunk *sample, *sample2, *sample3;
+
 int duration;
 
-Soundinit()
+void Soundinit(char* input)
 {
-	Mix_Chunk *sample;
+	FILE * check = fopen("ffmpeg.exe", "r");
+	if (check)
+	{
+		printf("you forgot ffmpeg please download ffmpeg.exe");
+		exit(1);
+	}
+	
+	char command[70];
+	system("del /f /q audio66.ogg >nul 2>&1");
+	system("y");
+
+
+	strcpy(command, "ffmpeg -i ");
+	strcat(command, input);
+	strcat(command," audio66.ogg");
+	system(command);
+
+	system("del /f /q slowaudio66.ogg >nul 2>&1");
+	system("y");
+	
+	system("ffmpeg -i audio66.ogg -filter:a \"atempo = .7\" -vn slowaudio66.ogg");
+	//system("ping 192.0.2.2 -n 1 -w 10000 > nul");
+	
 
 	if (SDL_Init(SDL_INIT_AUDIO) == -1) 
 	{
@@ -45,27 +67,22 @@ Soundinit()
 		exit(1);
 	}
 
-
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) == -1) 
+	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024) == -1)
 	{
 		slog("Mix_OpenAudio: %s\n", Mix_GetError());
 		exit(2);
 	}
 
-	sample = Mix_LoadWAV("test2.wav");
-   
+	sample = Mix_LoadMUS("audio66.ogg");
+	sample2 = Mix_LoadMUS("slowaudio66.ogg");
 
-
-	if (Mix_PlayChannel(2, sample, 0) == -1)
-	{
-		printf("Mix_PlayChannel: %s\n", Mix_GetError());
-	}
+	Mix_PlayMusic(sample, 0);	
 }
 
 
-Soundinit2()
+void Soundinit2()
 {
-	Mix_Chunk *sample;
+	Mix_Chunk *sample, *sample2,*sample3;
 
 	if (SDL_Init(SDL_INIT_AUDIO) == -1)
 	{
@@ -82,45 +99,78 @@ Soundinit2()
 
 	sample = Mix_LoadWAV("end.wav");
 
-
+	
 
 	if (Mix_PlayChannel(2, sample, 0) == -1)
 	{
 		printf("Mix_PlayChannel: %s\n", Mix_GetError());
 	}
 }
-
-
-void SoundVolume()
+int currlocationslow = 0;
+void audiospeedchange(int speed, double time)
 {
-	Mix_Music *song;
-	
-	song = Mix_LoadMUS("test2.wav");
-	
+	if (currlocationslow==0 && speed==0)
+	{
+		currlocationslow = 1;
+		Mix_PlayMusic(sample2,0);
+		Mix_SetMusicPosition((time*1.42));
+	}
+
+	if (currlocationslow == 1 && speed == 1)
+	{
+		currlocationslow = 0;
+		Mix_PlayMusic(sample, 0);
+		Mix_SetMusicPosition(time);
+	}
 }
 
-Soundclose()
+void fastforward(int time)
+{
+	int realtime = time / 1000;
+	Mix_SetMusicPosition(realtime);
+}
+
+
+
+void SoundVolume(int volume)
+{
+	Mix_VolumeMusic(volume);
+}
+
+void Soundclose()
 {
 	memset(amplitude, 0, sizeof(amplitude));
-	Mix_HaltChannel(-1);
+	Mix_CloseAudio();
 }
 
 
-Soundinfo(FILE *ptr)
+
+long Soundinfo(FILE *ptr)
 {
 
+	    long biggest_amp=0;
+	    int innercounter = 0;
 		// get file path
 		char cwd[1024];
-		if (getcwd(cwd, sizeof(cwd)) != NULL) {
+		long size_of_each_sample;
+		long num_samples;
+		long i = 0;
+		char data_buffer[16];
+		int  size_is_correct = TRUE;
+		// read header parts
+		int read = 0;
+		long bytes_in_each_channel;
+		char format_name[10] = "";
+		long low_limit = 0l;
+		long high_limit = 0l;
+		unsigned int  xchannels = 0;
+		int data_in_channel = 0;
+		int ampcounter = 0;
+		
 
-
-
-
-
-			int read = 0;
-
-			// read header parts
-
+		if (getcwd(cwd, sizeof(cwd)) != NULL) 
+		{
+		
 
 			//1-4
 			read = fread(header.riff, sizeof(header.riff), 1, ptr);//byte 1-4
@@ -159,7 +209,7 @@ Soundinfo(FILE *ptr)
 			read = fread(buffer2, sizeof(buffer2), 1, ptr);
 
 			header.format_type = buffer2[0] | (buffer2[1] << 8);
-			char format_name[10] = "";
+			
 			if (header.format_type == 1)
 				strcpy(format_name, "PCM");
 			else if (header.format_type == 6)
@@ -221,35 +271,37 @@ Soundinfo(FILE *ptr)
 
 
 			// calculate no.of samples
-			long num_samples = (8 * header.data_size) / (header.channels * header.bits_per_sample);
+			 num_samples = (8 * header.data_size) / (header.channels * header.bits_per_sample);
 
 
-			long size_of_each_sample = (header.channels * header.bits_per_sample) / 8;
+			size_of_each_sample = (header.channels * header.bits_per_sample) / 8;
 
 
 
 			memset(amplitude, 0, sizeof(amplitude));
 
 			// read each sample from data chunk if PCM
-			if (header.format_type == 1) { // PCM
+			if (header.format_type == 1) 
+			{ // PCM
 
-				long i = 0;
-				char data_buffer[16];
-				int  size_is_correct = TRUE;
+				i = 0;
+				
 
 				// make sure that the bytes-per-sample is completely divisible by num.of channels
-				long bytes_in_each_channel = (size_of_each_sample / header.channels);
-				if ((bytes_in_each_channel  * header.channels) != size_of_each_sample) {
+				bytes_in_each_channel = (size_of_each_sample / header.channels);
+				if ((bytes_in_each_channel  * header.channels) != size_of_each_sample) 
+				{
 					printf("Error: %ld x %ud <> %ld\n", bytes_in_each_channel, header.channels, size_of_each_sample);
 					size_is_correct = FALSE;
 				}
 
-					if (size_is_correct) {
+					if (size_is_correct)
+					{
 						// the valid amplitude range for values based on the bits per sample
-						long low_limit = 0l;
-						long high_limit = 0l;
+						
 
-						switch (header.bits_per_sample) {
+						switch (header.bits_per_sample) 
+						{
 						case 8:
 							low_limit = -128;
 							high_limit = 127;
@@ -262,84 +314,68 @@ Soundinfo(FILE *ptr)
 						}
 
 
-						for (i = 1; i <= num_samples; i++) {
+						for (i = 1; i <= num_samples; i++)
+						{
 
 							read = fread(data_buffer, sizeof(data_buffer), 1, ptr);
-							if (read == 1) {
+							if (read == 1)
+							{
 
 								// dump the data read
-								unsigned int  xchannels = 0;
-								int data_in_channel = 0;
-
-								for (xchannels = 0; xchannels < header.channels; xchannels++) {
+							for (xchannels = 0; xchannels < header.channels; xchannels++) 
+							{
 
 									// convert data from little endian to big endian based on bytes in each channel sample
-									if (bytes_in_each_channel == 4) {
+									if (bytes_in_each_channel == 4) 
+									{
 										data_in_channel = data_buffer[0] |
 											(data_buffer[1] << 8) |
 											(data_buffer[2] << 16) |
 											(data_buffer[3] << 24);
 									}
-									else if (bytes_in_each_channel == 2) {
+									else if (bytes_in_each_channel == 2) 
+									{
 										data_in_channel = data_buffer[0] |
 											(data_buffer[1] << 8);
 									}
-									else if (bytes_in_each_channel == 1) {
+									else if (bytes_in_each_channel == 1) 
+									{
 										data_in_channel = data_buffer[0];
 									}
 
-
-
 								}
 									
-								amplitude[counter] = data_in_channel;
-								counter++;
+								amplitude[ampcounter] = data_in_channel;
+								ampcounter++;
 
 							}
-							else {
+							else
+							{
 								printf("Error reading file. %d bytes\n", read);
 								break;
 							}
 
-						} // 	for (i =1; i <= num_samples; i++) {
+						} 
 
-					} // 	if (size_is_correct) { 
+					} 
 
 
-				} //  if (header.format_type == 1) { 
-
+				} 
 
 				fclose(ptr);
 
-				while(1)
-				{
-					if (counter < 0)
+				
+					if (amplitude[0]==0)
 					{
-						break;
+						slog("your amp is zero stop giving me empty wav files");
 					}
-					
-					if (amplitude[counter] != 0)
-					{
-						printf("\namplitude %i is %i\n",counter, amplitude[counter]);
-						counter--;
-					}
-					else
-					{
-						counter--;
-						continue;
-					}
-						
-						
-						
+					slog("your amp is %li", amplitude[0]);
+					return amplitude[0];
 
-				}
-
-
-				return 0;
-
+				
 			}
 
-		}
+}
 
 
 

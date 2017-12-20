@@ -63,7 +63,7 @@ void gf2d_entity_init(int boss, long amplitude)
 
 	}
 	entity_manager.EntityList[0]->health=10000;
-	entity_manager.EntityList[0]->powerup = 100000000000;
+	entity_manager.EntityList[0]->powerup = 0;
 	entity_manager.EntityList[0]->pos.x = 200;
 	entity_manager.EntityList[0]->pos.y = 400;
 	entity_manager.EntityList[0]->armor = 0;
